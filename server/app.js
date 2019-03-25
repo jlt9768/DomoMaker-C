@@ -21,16 +21,16 @@ mongoose.connect(dbURL, (err) => {
   }
 });
 
-let redisUrl = {
-    hostname: 'localhost',
-    port: 6379,
+let redisURL = {
+  hostname: 'localhost',
+  port: 6379,
 };
 
 let redisPASS;
 
-if(process.env.REDISCLOUD_URL){
-    redisURL = url.parse(process.env.REDISCLOUD_URL);
-    redisPASS = redisURL.auth.split(':')[1];
+if (process.env.REDISCLOUD_URL) {
+  redisURL = url.parse(process.env.REDISCLOUD_URL);
+  redisPASS = redisURL.auth.split(':')[1];
 }
 
 const router = require('./router.js');
@@ -45,15 +45,15 @@ app.use(bodyParser.urlencoded({
 app.use(session({
   key: 'sessionid',
   store: new RedisStore({
-     host: redisUrl.hostname,
-     port: redisUrl.port,
-     pass: redisPASS,
+    host: redisURL.hostname,
+    port: redisURL.port,
+    pass: redisPASS,
   }),
   secret: 'Domo Arigato',
   resave: true,
   saveUninitialized: true,
-  cookie:{
-      httpOnly:true,
+  cookie: {
+    httpOnly: true,
   },
 }));
 app.engine('handlebars', expressHandlebars({ defaultLayout: 'main' }));
@@ -64,9 +64,9 @@ app.use(cookieParser());
 
 app.use(csrf());
 app.use((err, req, res, next) => {
-   if(err.code !=='EBADCASRFTOKEN') return next(err);
-   console.log('Missing CSRF token');
-    return false;
+  if (err.code !== 'EBADCASRFTOKEN') return next(err);
+  console.log('Missing CSRF token');
+  return false;
 });
 
 router(app);
